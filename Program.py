@@ -21,6 +21,8 @@ def sub_string_match(pattern, file_str):
 
 
     return False    
+
+    
 def check_founded_pattern(patterns, index,step):
     # Check if virus files have patterns in common
     directory = f"Train\\Malware Sample\\{i}"
@@ -47,6 +49,23 @@ def check_founded_pattern(patterns, index,step):
     
     patterns = [patterns[i] for i in range(len(patterns)) if(pattern_similarity_occurred[i] < int(0.2*len(step)))] # if a pattern exist in more than 20% of clean files then it's not virus pattern
 
+
+def unicode2hex_cleaned(file_add):
+    
+    no_use_chars = [str(hex(i))[2::] for i in range(20,47)]
+    no_use_chars.extend([str(hex(i))[2::] for i in range(123, 192)])
+    no_use_chars.append(str(hex(0))[2::])
+    file_hex_str = ""   
+    with open(file_add, "rb") as file:
+        file_hex_data = binascii.hexlify(file.read()) # convert to hex equivalent for simplification in calculation
+        file_hex_str = file_hex_data.decode('utf-8')
+        file_hex_str = file_hex_str[int(0.1*len(file_hex_str)):int(0.6*len(file_hex_str))] # no need to check all of the file beacause the important section of it, is it's first half
+        for char in no_use_chars:
+            file_hex_str = hex_str.replace(char, '')
+        
+    return file_hex_str
+
+
 def Find_similar_substring(file_ad1, file_ad2, patterns):
     file_str1 = unicode2hex_cleaned(file_ad1)
     file_str2 = unicode2hex_cleaned(file_ad2)
@@ -68,22 +87,11 @@ def Find_similar_substring(file_ad1, file_ad2, patterns):
 
         i+=1
 
-def unicode2hex_cleaned(file_add):
-    file_hex_str = ""   
-    with open(file_add, "rb") as file:
-        file_hex_data = binascii.hexlify(file.read()) # convert to hex equivalent for simplification in calculation
-        file_hex_str = file_hex_data.decode('utf-8')
-        file_hex_str = file_hex_str[int(0.1*len(file_hex_str)):int(0.6*len(file_hex_str))] # no need to check all of the file beacause the important section of it, is it's first half
-        for char in no_use_chars:
-            file_hex_str = hex_str.replace(char, '')
-        
-    return file_hex_str
 
 
-def find_pattern():
-    Virus_patterns = []
+def find_pattern(directory, Virus_patterns):
     for i in range(20):
-        directory = f"Train\\Malware Sample\\{i}"
+        directory = directory + str(i)
         j = 0
         patternsOfrow = [] #similar substring (pattern) in a row(consequtive files) since consequtive files have the most similar patterns
         while(j<len(os.listdir(directory))-1): #check files in a row of size 15 since the consequtive files have the most similar patterns
@@ -94,7 +102,7 @@ def find_pattern():
             if(j%15==0):
                 j += 30
             check_founded_pattern(patternsOfrow, j)
-            Virus_patterns[i].extend(patternsOftwo)
+            Virus_patterns.append(patternsOftwo)
 
     with open('Viruses.txt', 'w') as file:
         for i in range(len(Virus_patterns)):
@@ -113,9 +121,6 @@ def Is_Virus(input_file, Virus_patterns):
                 
 def Searching_for_virus(directory, Virus_patterns):
 
-    no_use_chars = [str(hex(i))[2::] for i in range(20,47)]
-    no_use_chars.extend([str(hex(i))[2::] for i in range(123, 192)])
-    no_use_chars.append(str(hex(0))[2::])
     Virus_patterns = []
     with open('Viruses.txt') as file:
         Virus_patterns = file.readlines()
@@ -138,10 +143,10 @@ def Searching_for_virus(directory, Virus_patterns):
 # Pre-Process
 
 Virus_patterns = []
-find_pattern()
+directory = "C:\git\Anti_Virus\Train\Malware Sample\\"
+find_pattern(directory, Virus_patterns)
 
 
 # Main-Process
 directory = input()
-Searching_for_virus
 Searching_for_virus(directory, Virus_patterns)
