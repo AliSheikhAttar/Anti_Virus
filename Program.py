@@ -103,7 +103,7 @@ def find_pattern():
 
 
 def Is_Virus(input_file, Virus_patterns):
-    for i in range(len(Virus_patterns)): # since evey trained folder has their unique patterns
+    for i in range(len(Virus_patterns)):
         # Hashing & Matching
         if(sub_string_match(Virus_patterns[i], input_file)):
             return True
@@ -135,5 +135,13 @@ def Searching_for_virus(directory, Virus_patterns):
 
 
 
+# Pre-Process
 
-Virus_patterns = [[] for i in range(20)]
+Virus_patterns = []
+find_pattern()
+
+
+# Main-Process
+directory = input()
+Searching_for_virus
+Searching_for_virus(directory, Virus_patterns)
